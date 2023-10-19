@@ -63,7 +63,7 @@ function App() {
 
   const handleSortAndStack = () => {
     const sortedData = [...cardData].sort((a, b) =>
-      isDescending ? b.views - a.views : a.views - b.views
+      isDescending ? a.views - b.views : b.views - a.views
     );
     setCardData(sortedData);
     setIsStacked(true);
@@ -75,15 +75,9 @@ function App() {
       <button onClick={handleSortAndStack} className="btn">
         Sort & Stack
       </button>
-      <div
-        style={{
-          flexDirection: !isStacked ? "row" : "column",
-          gap: !isStacked ? "1.5rem" : "40px",
-        }}
-        className="cards-container"
-      >
-        {cardData?.map((val) => (
-          <Card key={val.id} data={val} />
+      <div className={`cards-container  ${isStacked ? "center" : ""}`}>
+        {cardData?.map((val, index) => (
+          <Card key={val.id} data={val} isStacked={isStacked} index={index} />
         ))}
       </div>
     </div>

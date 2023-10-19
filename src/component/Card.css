@@ -56,6 +56,10 @@
   padding: 1rem 1.1rem;
 }
 
+.cards-stacked {
+  position: absolute;
+}
+
 .flex-col {
   display: flex;
   flex-direction: column;

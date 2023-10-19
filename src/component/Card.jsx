@@ -1,6 +1,6 @@
 import "./Card.css";
 
-const Card = ({ data }) => {
+const Card = ({ data, isStacked, index }) => {
   const {
     title = "",
     time = "",
@@ -12,7 +12,15 @@ const Card = ({ data }) => {
     imageLink = "",
   } = data;
   return (
-    <div className="card-container">
+    <div
+      className={`card-container ${isStacked ? "cards-stacked" : ""}`}
+      style={{
+        transform: isStacked
+          ? `translateX(${index * 40}px) translateY(-${index * 40}px)`
+          : "",
+        zIndex: index,
+      }}
+    >
       <img src={imageLink} alt="mountain" className="card-image" />
       <div className="card-content">
         <div className="card-info-container">
