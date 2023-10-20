@@ -1,87 +1,207 @@
 import "./App.css";
 import Card from "./component/Card";
 import { useState } from "react";
-function App() {
-  const initialCardData = [
-    {
-      id: "1",
-      title: "Post One",
-      time: "4 Day ago",
-      description:
-        "Croque monsieur paneer cheese triangles. When the cheese comes out everybody's happy cheeseburger melted cheese pepper jack croque",
-      reads: 7,
-      views: 3224,
-      comments: 21,
-      color: "#E44759",
-      imageLink:
-        "https://discovery.sndimg.com/content/dam/images/discovery/editorial/podcasts/Curiosity/2020/3/GettyImages-675488626.jpg.rend.hgtvcom.1280.1280.suffix/1583712292845.jpeg",
-    },
-    {
-      id: "2",
-      title: "Post Two",
-      time: "1 week ago",
-      description:
-        "Croque monsieur paneer cheese triangles. When the cheese comes out everybody's happy cheeseburger melted cheese pepper jack croque",
-      reads: 11,
-      views: 1699,
-      comments: 27,
-      color: "#F2A93B",
-      imageLink:
-        "https://discovery.sndimg.com/content/dam/images/discovery/editorial/podcasts/Curiosity/2020/3/GettyImages-675488626.jpg.rend.hgtvcom.1280.1280.suffix/1583712292845.jpeg",
-    },
-    {
-      id: "3",
-      title: "Post Three",
-      time: "4 week ago",
-      description:
-        "Croque monsieur paneer cheese triangles. When the cheese comes out everybody's happy cheeseburger melted cheese pepper jack croque",
-      reads: 4,
-      views: 1624,
-      comments: 17,
-      color: "#377E22",
-      imageLink:
-        "https://discovery.sndimg.com/content/dam/images/discovery/editorial/podcasts/Curiosity/2020/3/GettyImages-675488626.jpg.rend.hgtvcom.1280.1280.suffix/1583712292845.jpeg",
-    },
-    {
-      id: "4",
-      title: "Post Four",
-      time: "4 week ago",
-      description:
-        "Croque monsieur paneer cheese triangles. When the cheese comes out everybody's happy cheeseburger melted cheese pepper jack croque",
-      reads: 4,
-      views: 4624,
-      comments: 17,
-      color: "#4A2CDE",
-      imageLink:
-        "https://discovery.sndimg.com/content/dam/images/discovery/editorial/podcasts/Curiosity/2020/3/GettyImages-675488626.jpg.rend.hgtvcom.1280.1280.suffix/1583712292845.jpeg",
-    },
-  ];
+import { useSelector, useDispatch } from "react-redux";
+import { addCard, sortPostsByViews } from "./redux/countslice";
+import Modal from "react-modal";
 
-  const [cardData, setCardData] = useState(initialCardData);
+const customStyles = {
+  content: {
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    width: "300px",
+    transform: "translate(-50%, -50%)",
+    position: "absolute",
+    zIndex: 100,
+  },
+};
+
+function App() {
   const [isStacked, setIsStacked] = useState(false);
   const [isDescending, setIsDescending] = useState(true);
+  const [title, setTitle] = useState("");
+  let subtitle;
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    subtitle.style.color = "#f00";
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+    setTitle("");
+  }
 
   const handleSortAndStack = () => {
-    const sortedData = [...cardData].sort((a, b) =>
-      isDescending ? a.views - b.views : b.views - a.views
-    );
-    setCardData(sortedData);
+    dispatch(sortPostsByViews(isDescending));
     setIsStacked(true);
     setIsDescending(!isDescending);
   };
 
+  const posts = useSelector((state) => state.counter.posts);
+  const dispatch = useDispatch();
+
+  const generateRandomPost = (inputTitle = "") => {
+    function getRandomColor() {
+      const isLightColor = (color) => {
+        const r = parseInt(color.slice(1, 3), 16);
+        const g = parseInt(color.slice(3, 5), 16);
+        const b = parseInt(color.slice(5, 7), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 192; // Adjust this threshold as needed
+      };
+
+      let color;
+      do {
+        color = "#" + Math.floor(Math.random() * 16777215).toString(16);
+      } while (isLightColor(color));
+
+      return color;
+    }
+    const getRandomNumber = (min, max) =>
+      Math.floor(Math.random() * (max - min + 1)) + min;
+
+    const id = Math.random().toString(36).substring(7);
+    const title =
+      inputTitle !== "" ? inputTitle : "Post " + getRandomNumber(1, 100);
+    const time = getRandomNumber(1, 12) + " week ago";
+    const description =
+      "Croque monsieur paneer cheese triangles. When the cheese comes out everybody's happy cheeseburger melted cheese pepper jack croque";
+    const reads = getRandomNumber(1, 1000);
+    const views = getRandomNumber(1000, 10000);
+    const comments = getRandomNumber(1, 50);
+    const color = getRandomColor(); // Random color
+    const imageLink =
+      "https://discovery.sndimg.com/content/dam/images/discovery/editorial/podcasts/Curiosity/2020/3/GettyImages-675488626.jpg.rend.hgtvcom.1280.1280.suffix/1583712292845.jpeg"; // Replace with a random image URL
+
+    return {
+      id,
+      title,
+      time,
+      description,
+      reads,
+      views,
+      comments,
+      color,
+      imageLink,
+    };
+  };
+
   return (
-    <div className="container">
-      <button onClick={handleSortAndStack} className="btn">
-        Sort & Stack
-      </button>
-      <div className={`cards-container  ${isStacked ? "center" : ""}`}>
-        {cardData?.map((val, index) => (
-          <Card key={val.id} data={val} isStacked={isStacked} index={index} />
-        ))}
+    <>
+      <div className='container'>
+        <Modal
+          isOpen={modalIsOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeModal}
+          style={customStyles}
+          contentLabel='Example Modal'
+        >
+          <h2>Add Card with Title</h2>
+          <input
+            type='text'
+            placeholder='Enter a title'
+            style={{
+              padding: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              fontSize: "12px",
+              width: "80%",
+              marginBottom: "15px",
+              boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+            }}
+            onChange={(event) => setTitle(event.target.value)}
+            value={title}
+          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <button
+              className='btn_danger'
+              onClick={closeModal}
+            >
+              Cancel
+            </button>
+            <button
+              className='btn'
+              onClick={() => {
+                if (title == "") {
+                  alert("Please input title");
+                } else {
+                  dispatch(addCard(generateRandomPost(title)));
+                  closeModal();
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+        </Modal>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <button
+            onClick={handleSortAndStack}
+            className='btn'
+          >
+            Sort & Stack
+          </button>
+          <div style={{ width: "10px" }}></div>{" "}
+          {/* Add space between buttons */}
+          <button
+            onClick={() => dispatch(addCard(generateRandomPost()))}
+            className='btn'
+          >
+            Add Card
+          </button>
+        </div>
+
+        <div className={`cards-container  ${isStacked ? "center" : ""}`}>
+          {posts?.map((val, index) => (
+            <>
+              <Card
+                key={val.id}
+                data={val}
+                isStacked={isStacked}
+                index={index + 1}
+              />
+            </>
+          ))}
+        </div>
+        <div
+          style={{
+            position: "fixed",
+            bottom: "10px",
+            right: "10px",
+          }}
+        >
+          <button
+            className='btn'
+            onClick={openModal}
+          >
+            Add card with Title
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
 export default App;
+
