@@ -2,7 +2,13 @@ import "./App.css";
 import Card from "./component/Card";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addCard, sortPostsByViews } from "./redux/countslice";
+import {
+  addCard,
+  sortPostsByViews,
+  resetCards,
+  deleteCard,
+  filterCards,
+} from "./redux/countslice";
 import Modal from "react-modal";
 
 const customStyles = {
@@ -24,6 +30,7 @@ function App() {
   const [title, setTitle] = useState("");
   let subtitle;
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   function openModal() {
     setIsOpen(true);
@@ -46,6 +53,7 @@ function App() {
   };
 
   const posts = useSelector((state) => state.counter.posts);
+  const filteredPost = useSelector((state) => state.counter.filteredPost);
   const dispatch = useDispatch();
 
   const generateRandomPost = (inputTitle = "") => {
@@ -170,19 +178,52 @@ function App() {
           >
             Add Card
           </button>
+          <div style={{ width: "10px" }}></div>{" "}
+          <button
+            onClick={() => dispatch(resetCards())}
+            className='btn'
+          >
+            Reset Cards
+          </button>
+        </div>
+        <div className='search-container'>
+          <input
+            type='text'
+            className='search-input'
+            placeholder='Search card'
+            onChange={(event) => {
+              dispatch(filterCards(event.target.value));
+              setSearch(event.target.value);
+              console.log("hello");
+              console.log(search);
+            }}
+          />
         </div>
 
         <div className={`cards-container  ${isStacked ? "center" : ""}`}>
-          {posts?.map((val, index) => (
-            <>
-              <Card
-                key={val.id}
-                data={val}
-                isStacked={isStacked}
-                index={index + 1}
-              />
-            </>
-          ))}
+          {search === ""
+            ? posts?.map((val, index) => (
+                <>
+                  <Card
+                    key={val.id}
+                    data={val}
+                    isStacked={isStacked}
+                    index={index + 1}
+                    deleteCard={() => dispatch(deleteCard(val.id))}
+                  />
+                </>
+              ))
+            : filteredPost?.map((val, index) => (
+                <>
+                  <Card
+                    key={val.id}
+                    data={val}
+                    isStacked={isStacked}
+                    index={index + 1}
+                    deleteCard={() => dispatch(deleteCard(val.id))}
+                  />
+                </>
+              ))}
         </div>
         <div
           style={{

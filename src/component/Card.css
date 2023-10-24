@@ -25,6 +25,8 @@
 
 .card-info-container {
   padding: 1rem;
+  max-height: 100px;
+  min-height: 100px;
 }
 
 .card-time {

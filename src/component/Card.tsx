@@ -1,7 +1,7 @@
 import React from "react";
 import "./Card.css";
 
-const Card = ({ data, isStacked, index }) => {
+const Card = ({ data, isStacked, index, deleteCard }) => {
   const {
     title = "",
     time = "",
@@ -37,6 +37,16 @@ const Card = ({ data, isStacked, index }) => {
           </div>
           <div className='card-title'>{title}</div>
           <div className='card-description'>{description}</div>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center", // Center horizontally
+            alignItems: "center", // Center vertically
+            height: "50px", // Optional: This will center the content vertically within the viewport
+          }}
+        >
+          <button onClick={deleteCard}>Delete</button>
         </div>
         <div
           style={{ backgroundColor: color }}
